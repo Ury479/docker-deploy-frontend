@@ -1,7 +1,8 @@
-version: '3.3'
+version: '3.8'
+
 services:
-  frontend:
-    image: uryy/234-deploylab-frontend:latest
-    pull_policy: always
+  frontend-new:
+    image: uryy/frontend:latest
+    restart: always
     ports:
-      - "8086:80"
+      - "9999:80"
