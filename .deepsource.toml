@@ -1,7 +1,11 @@
 version = 1
 
 [[analyzers]]
-name = "docker"
+name = "javascript"
 
   [analyzers.meta]
-  dockerfile_paths = ["Dockerfile"]
+  plugins = [
+    "react",
+    "angularjs"
+  ]
+  environment = ["nodejs"]
