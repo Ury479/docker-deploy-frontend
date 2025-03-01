@@ -1,0 +1,8 @@
+version: '3.8'
+
+services:
+  frontend-new:
+    image: uryy/frontend:latest
+    restart: always
+    ports:
+      - "9999:80"
