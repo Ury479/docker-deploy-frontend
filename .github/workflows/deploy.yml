@@ -1,8 +1,10 @@
 name: Deploy frontend application
-"on":
+on:
   push:
     branches:
       - main
+      - feature-update-html # 让这两个分支都能触发 CI/CD
+
 jobs:
   docker:
     runs-on: ubuntu-latest
@@ -22,7 +24,7 @@ jobs:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_TOKEN }}
 
-      - name: prepare the docker-compose-prod run
+      - name: List files before build
         run: |
           ls -l
 
@@ -33,7 +35,7 @@ jobs:
           push: true
           tags: uryy/234-deploylab-frontend:latest
 
-      - name: copy file via ssh password
+      - name: Copy docker-compose-prod.yml file via SSH
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.HOST_SERVER }}
@@ -43,7 +45,7 @@ jobs:
           source: "docker-compose-prod.yml"
           target: "/home/ubuntu/frontend"
 
-      - name: docker compose
+      - name: Docker Compose Run
         uses: appleboy/ssh-action@v1.2.1
         with:
           host: ${{ secrets.HOST_SERVER }}
