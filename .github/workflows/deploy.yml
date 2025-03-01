@@ -11,6 +11,8 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
+        with:
+          path: backend # 让代码拉取到 backend 目录
 
       - name: Setup Java
         uses: actions/setup-java@v4
@@ -19,9 +21,17 @@ jobs:
           distribution: "adopt"
 
       - name: Run Maven Build
+        working-directory: backend
         run: |
           mvn clean install -DskipTests -B
-          mkdir -p target/dependency && (cd target/dependency; unzip ../*.jar)
+          mkdir -p target/dependency
+          JAR_FILE=$(ls target/*.jar | head -n 1)
+          if [ -f "$JAR_FILE" ]; then
+            cd target/dependency && unzip "$JAR_FILE"
+          else
+            echo "Error: No JAR file found in target/"
+            exit 1
+          fi
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -36,14 +46,23 @@ jobs:
           password: ${{ secrets.DOCKER_HUB_TOKEN }}
 
       - name: Prepare Docker-Compose
-        run: ls -l
+        run: ls -l || echo "docker-compose.yml not found"
 
       - name: Build and Push Docker Image
         uses: docker/build-push-action@v6
         with:
-          context: .
+          context: backend
           push: true
           tags: ${{ secrets.DOCKER_HUB_USERNAME }}/234-deploylab-backend:latest
+
+      - name: Ensure docker-compose.yml exists before copying
+        run: |
+          if [ -f "docker-compose.yml" ]; then
+            echo "docker-compose.yml found, proceeding..."
+          else
+            echo "Error: docker-compose.yml not found!"
+            exit 1
+          fi
 
       - name: Copy docker-compose.yml to Remote Server
         uses: appleboy/scp-action@v0.1.7
