@@ -22,7 +22,7 @@ jobs:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_TOKEN }}
 
-      - name: prepare the docker-compose run
+      - name: prepare the docker-compose-prod run
         run: |
           ls -l
 
@@ -40,7 +40,7 @@ jobs:
           username: ${{ secrets.HOST_USER_NAME }}
           key: ${{ secrets.HOST_SSH_PRIVATE_KEY }}
           port: 22
-          source: "docker-compose.yml"
+          source: "docker-compose-prod.yml"
           target: "/home/ubuntu/frontend"
 
       - name: docker compose
